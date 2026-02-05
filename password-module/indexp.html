@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Password Generator</title>
+
+  <!-- ✅ CONNECT CSS -->
+  <link rel="stylesheet" href="stylep.css">
+</head>
+
+<body>
+
+ <div class="container">
+
+  <!-- PASSWORD GENERATOR -->
+  <div class="card">
+    <h2>Password Generator</h2>
+
+    <div class="input-group">
+      <input type="password" id="generatedPassword" placeholder="Generated password" readonly>
+      <span class="eye" onclick="toggleView('generatedPassword')">👁</span>
+    </div>
+
+    <div class="btn-row">
+      <button onclick="generatePassword()">Generate</button>
+      <button onclick="copyPassword()">Copy</button>
+      <button onclick="clearPassword()">Clear</button>
+    </div>
+
+    <button class="secondary" onclick="toggleVault()">Open Vault</button>
+  </div>
+
+  <!-- PASSWORD VAULT -->
+  <div id="vault" class="card hidden">
+    <h2>Password Vault</h2>
+
+    <input type="text" id="label" placeholder="Label (eg: Gmail, File)">
+    
+    <div class="input-group">
+      <input type="password" id="vaultPassword" placeholder="Password">
+      <span class="eye" onclick="toggleView('vaultPassword')">👁</span>
+    </div>
+
+    <div class="btn-row">
+      <button onclick="saveToVault()">Save</button>
+      <button class="danger" onclick="toggleVault()">Close</button>
+    </div>
+
+    <ul id="vaultList"></ul>
+  </div>
+
+</div>
+
+  <!-- ✅ CONNECT JS (VERY IMPORTANT: at bottom) -->
+  <script src="scriptp.js"></script>
+
+</body>
+</html>

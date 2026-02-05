@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Offline Encryption & Decryption</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+
+    <div class="">
+        <h1>Encryption & Decryption Text</h1>
+        <p class="subtitle">Offline | Secure | Client-Side</p>
+    
+
+        <label>Enter Text</label>
+        <textarea id="inputText" placeholder="Type your message here..."></textarea>
+
+       <label>Secret Key (for AES and DES)</label>
+       
+<div style="position: relative;">
+    <input type="password" id="secretKey" placeholder="Enter secret key">
+    <span onclick="toggleKey()"
+          style="
+            position:absolute;
+            right:10px;
+            top:50%;
+            transform:translateY(-50%);
+            cursor:pointer;
+            user-select:none;
+          ">
+        👁
+    </span>
+</div>
+
+        <label>Select Operation</label>
+        <select id="operation">
+            <option value="aes-encrypt">AES Encrypt</option>
+            <option value="aes-decrypt">AES Decrypt</option>
+            <option value="base64-encode">Base64 Encode</option>
+            <option value="base64-decode">Base64 Decode</option>
+            <option value="hash">SHA-256 Hash</option>
+        </select>
+
+        <div class="buttons">
+            <button onclick="processText()">Process</button>
+            <button onclick="clearText()" class="danger">Clear</button>
+        </div>
+
+        <label>Output</label>
+        <textarea id="outputText" readonly></textarea>
+
+        <button onclick="copyOutput()" class="copy">Copy Output</button>
+
+        <div class="links">
+            <a href="about.html">About</a> |
+            <a href="algorithms.html">Algorithms</a>
+        </div>
+    </div>
+
+    <script src="js/aes.js"></script>
+    <script src="js/base64.js"></script>
+    <script src="js/hash.js"></script>
+    <script src="js/main.js"></script>
+
+</body>
+</html>

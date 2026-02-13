@@ -2,66 +2,1162 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Offline Encryption & Decryption</title>
-    <link rel="stylesheet" href="css/style.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EnDecrypt Online - Complete Encryption Suite</title>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Orbitron:wght@700;900&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --neon-cyan: #00fff9;
+            --neon-pink: #ff006e;
+            --neon-green: #39ff14;
+            --dark-bg: #0a0e27;
+            --darker-bg: #050810;
+            --terminal-bg: rgba(10, 14, 39, 0.95);
+            --border-color: rgba(0, 255, 249, 0.3);
+            --text-primary: #e0e6ff;
+            --text-secondary: #8892b0;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'JetBrains Mono', monospace;
+            background: var(--darker-bg);
+            color: var(--text-primary);
+            min-height: 100vh;
+            overflow-x: hidden;
+            position: relative;
+        }
+
+        /* Animated background */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: 
+                linear-gradient(rgba(0, 255, 249, 0.03) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(0, 255, 249, 0.03) 1px, transparent 1px);
+            background-size: 50px 50px;
+            animation: gridMove 20s linear infinite;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        @keyframes gridMove {
+            0% { transform: translate(0, 0); }
+            100% { transform: translate(50px, 50px); }
+        }
+
+        .bg-orb {
+            position: fixed;
+            border-radius: 50%;
+            filter: blur(80px);
+            opacity: 0.15;
+            z-index: 0;
+            pointer-events: none;
+        }
+
+        .orb-1 {
+            width: 400px;
+            height: 400px;
+            background: var(--neon-cyan);
+            top: -100px;
+            right: -100px;
+            animation: float 15s ease-in-out infinite;
+        }
+
+        .orb-2 {
+            width: 300px;
+            height: 300px;
+            background: var(--neon-pink);
+            bottom: -50px;
+            left: -50px;
+            animation: float 20s ease-in-out infinite reverse;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translate(0, 0) scale(1); }
+            50% { transform: translate(30px, -30px) scale(1.1); }
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+            position: relative;
+            z-index: 1;
+        }
+
+        /* Header */
+        header {
+            text-align: center;
+            margin-bottom: 2rem;
+            animation: fadeInDown 0.8s ease-out;
+        }
+
+        @keyframes fadeInDown {
+            from {
+                opacity: 0;
+                transform: translateY(-30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        h1 {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 3rem;
+            font-weight: 900;
+            background: linear-gradient(135deg, var(--neon-cyan), var(--neon-pink));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 0.5rem;
+            letter-spacing: 2px;
+        }
+
+        .subtitle {
+            color: var(--text-secondary);
+            font-size: 0.85rem;
+            letter-spacing: 2px;
+        }
+
+        .privacy-badge {
+            display: inline-block;
+            margin-top: 1rem;
+            padding: 0.5rem 1rem;
+            background: rgba(0, 255, 249, 0.1);
+            border: 1px solid var(--border-color);
+            border-radius: 20px;
+            font-size: 0.75rem;
+            color: var(--neon-cyan);
+        }
+
+        /* Navigation Menu */
+        .nav-menu {
+            display: flex;
+            gap: 0.5rem;
+            margin-bottom: 2rem;
+            flex-wrap: wrap;
+            animation: fadeInUp 0.8s ease-out 0.2s both;
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .nav-btn {
+            flex: 1;
+            min-width: 160px;
+            padding: 0.9rem 1.2rem;
+            background: rgba(0, 255, 249, 0.05);
+            border: 2px solid var(--border-color);
+            color: var(--text-primary);
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.8rem;
+            font-weight: 700;
+            cursor: pointer;
+            border-radius: 6px;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .nav-btn::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            border-radius: 50%;
+            background: rgba(0, 255, 249, 0.2);
+            transform: translate(-50%, -50%);
+            transition: width 0.5s, height 0.5s;
+        }
+
+        .nav-btn:hover::before {
+            width: 300px;
+            height: 300px;
+        }
+
+        .nav-btn:hover {
+            border-color: var(--neon-cyan);
+            box-shadow: 0 0 20px rgba(0, 255, 249, 0.3);
+            transform: translateY(-2px);
+        }
+
+        .nav-btn.active {
+            background: linear-gradient(135deg, rgba(0, 255, 249, 0.2), rgba(255, 0, 110, 0.2));
+            border-color: var(--neon-cyan);
+            box-shadow: 0 0 30px rgba(0, 255, 249, 0.4);
+        }
+
+        .nav-btn span {
+            position: relative;
+            z-index: 1;
+        }
+
+        /* Tool Container */
+        .tool-container {
+            background: var(--terminal-bg);
+            border: 2px solid var(--border-color);
+            border-radius: 12px;
+            padding: 2.5rem;
+            box-shadow: 0 0 50px rgba(0, 255, 249, 0.1);
+            backdrop-filter: blur(10px);
+            position: relative;
+            overflow: hidden;
+            display: none;
+        }
+
+        .tool-container.active {
+            display: block;
+            animation: fadeIn 0.5s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .tool-container::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, var(--neon-cyan), transparent);
+            animation: scanline 3s linear infinite;
+        }
+
+        @keyframes scanline {
+            0% { left: -100%; }
+            100% { left: 100%; }
+        }
+
+        .tool-title {
+            font-size: 1.5rem;
+            color: var(--neon-cyan);
+            margin-bottom: 0.5rem;
+            font-weight: 700;
+        }
+
+        .tool-description {
+            color: var(--text-secondary);
+            font-size: 0.85rem;
+            margin-bottom: 2rem;
+        }
+
+        /* Algorithm selector */
+        .algorithm-selector {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .algo-btn {
+            padding: 0.9rem 1rem;
+            background: rgba(0, 255, 249, 0.05);
+            border: 2px solid var(--border-color);
+            color: var(--text-primary);
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.8rem;
+            font-weight: 700;
+            cursor: pointer;
+            border-radius: 6px;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .algo-btn:hover {
+            border-color: var(--neon-cyan);
+            box-shadow: 0 0 20px rgba(0, 255, 249, 0.3);
+            transform: translateY(-2px);
+        }
+
+        .algo-btn.active {
+            background: linear-gradient(135deg, rgba(0, 255, 249, 0.2), rgba(255, 0, 110, 0.2));
+            border-color: var(--neon-cyan);
+            box-shadow: 0 0 30px rgba(0, 255, 249, 0.4);
+        }
+
+        /* Form elements */
+        .form-section {
+            margin-bottom: 1.5rem;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 0.5rem;
+            color: var(--text-primary);
+            font-size: 0.85rem;
+            font-weight: 700;
+        }
+
+        textarea, input[type="text"], input[type="password"], input[type="number"], select {
+            width: 100%;
+            padding: 1rem;
+            background: rgba(5, 8, 16, 0.8);
+            border: 2px solid rgba(0, 255, 249, 0.2);
+            border-radius: 6px;
+            color: var(--text-primary);
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.9rem;
+            resize: vertical;
+            transition: all 0.3s ease;
+        }
+
+        textarea {
+            min-height: 120px;
+        }
+
+        textarea:focus, input:focus, select:focus {
+            outline: none;
+            border-color: var(--neon-cyan);
+            box-shadow: 0 0 20px rgba(0, 255, 249, 0.2);
+        }
+
+        .two-column {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1.5rem;
+        }
+
+        /* Buttons */
+        .button-group {
+            display: flex;
+            gap: 1rem;
+            margin: 1.5rem 0;
+        }
+
+        .btn {
+            flex: 1;
+            padding: 1rem 2rem;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.9rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--neon-cyan), #00ccff);
+            color: var(--darker-bg);
+        }
+
+        .btn-secondary {
+            background: linear-gradient(135deg, var(--neon-pink), #ff3385);
+            color: white;
+        }
+
+        .btn-outline {
+            background: transparent;
+            border: 2px solid var(--border-color);
+            color: var(--text-primary);
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+        }
+
+        .btn-primary:hover {
+            box-shadow: 0 10px 30px rgba(0, 255, 249, 0.4);
+        }
+
+        .btn-secondary:hover {
+            box-shadow: 0 10px 30px rgba(255, 0, 110, 0.4);
+        }
+
+        /* Output section */
+        .output-section {
+            margin-top: 2rem;
+            padding-top: 2rem;
+            border-top: 2px solid rgba(0, 255, 249, 0.1);
+        }
+
+        .output-box {
+            background: rgba(5, 8, 16, 0.8);
+            border: 2px solid rgba(57, 255, 20, 0.3);
+            border-radius: 6px;
+            padding: 1rem;
+            min-height: 100px;
+            color: var(--neon-green);
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.85rem;
+            word-break: break-all;
+            position: relative;
+        }
+
+        .copy-btn {
+            position: absolute;
+            top: 0.5rem;
+            right: 0.5rem;
+            padding: 0.5rem 1rem;
+            background: rgba(0, 255, 249, 0.1);
+            border: 1px solid var(--neon-cyan);
+            color: var(--neon-cyan);
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.75rem;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .copy-btn:hover {
+            background: rgba(0, 255, 249, 0.2);
+            box-shadow: 0 0 15px rgba(0, 255, 249, 0.3);
+        }
+
+        /* Password Generator specific */
+        .password-options {
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+            margin-top: 1rem;
+        }
+
+        .checkbox-group {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        input[type="checkbox"] {
+            width: 20px;
+            height: 20px;
+            cursor: pointer;
+        }
+
+        input[type="range"] {
+            flex: 1;
+            height: 6px;
+            background: rgba(0, 255, 249, 0.2);
+            border-radius: 3px;
+            outline: none;
+        }
+
+        input[type="range"]::-webkit-slider-thumb {
+            width: 20px;
+            height: 20px;
+            background: var(--neon-cyan);
+            border-radius: 50%;
+            cursor: pointer;
+        }
+
+        .length-display {
+            font-size: 1.2rem;
+            color: var(--neon-cyan);
+            font-weight: 700;
+            min-width: 50px;
+            text-align: center;
+        }
+
+        /* File upload */
+        .file-upload-zone {
+            border: 2px dashed var(--border-color);
+            border-radius: 8px;
+            padding: 3rem 2rem;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            background: rgba(0, 255, 249, 0.02);
+        }
+
+        .file-upload-zone:hover {
+            border-color: var(--neon-cyan);
+            background: rgba(0, 255, 249, 0.05);
+        }
+
+        .file-upload-zone.dragover {
+            border-color: var(--neon-pink);
+            background: rgba(255, 0, 110, 0.05);
+        }
+
+        .file-icon {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+        }
+
+        .file-name {
+            margin-top: 1rem;
+            color: var(--neon-green);
+            font-size: 0.9rem;
+        }
+
+        /* Alert boxes */
+        .alert {
+            padding: 1rem;
+            border-radius: 6px;
+            margin-bottom: 1.5rem;
+            font-size: 0.85rem;
+            border-left: 4px solid;
+        }
+
+        .alert-warning {
+            background: rgba(255, 165, 0, 0.1);
+            border-color: orange;
+            color: #ffb84d;
+        }
+
+        .alert-info {
+            background: rgba(0, 255, 249, 0.1);
+            border-color: var(--neon-cyan);
+            color: var(--neon-cyan);
+        }
+
+        /* Show passphrase toggle */
+        .passphrase-toggle {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-top: 0.5rem;
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 2rem;
+            }
+
+            .nav-menu {
+                flex-direction: column;
+            }
+
+            .nav-btn {
+                min-width: 100%;
+            }
+
+            .two-column {
+                grid-template-columns: 1fr;
+            }
+
+            .button-group {
+                flex-direction: column;
+            }
+        }
+    </style>
 </head>
 <body>
+    <div class="bg-orb orb-1"></div>
+    <div class="bg-orb orb-2"></div>
 
+    <div class="container">
+        <header>
+            <h1>EnDecrypt Online</h1>
+            <p class="subtitle">Complete Encryption Suite</p>
+            <div class="privacy-badge">🔒 All tools run entirely in your browser</div>
+        </header>
 
-    <div class="">
-        <h1>Encryption & Decryption Text</h1>
-        <p class="subtitle">Offline | Secure | Client-Side</p>
-    
-
-        <label>Enter Text</label>
-        <textarea id="inputText" placeholder="Type your message here..."></textarea>
-
-       <label>Secret Key (for AES and DES)</label>
-       
-<div style="position: relative;">
-    <input type="password" id="secretKey" placeholder="Enter secret key">
-    <span onclick="toggleKey()"
-          style="
-            position:absolute;
-            right:10px;
-            top:50%;
-            transform:translateY(-50%);
-            cursor:pointer;
-            user-select:none;
-          ">
-        👁
-    </span>
-</div>
-
-        <label>Select Operation</label>
-        <select id="operation">
-            <option value="aes-encrypt">AES Encrypt</option>
-            <option value="aes-decrypt">AES Decrypt</option>
-            <option value="base64-encode">Base64 Encode</option>
-            <option value="base64-decode">Base64 Decode</option>
-            <option value="hash">SHA-256 Hash</option>
-        </select>
-
-        <div class="buttons">
-            <button onclick="processText()">Process</button>
-            <button onclick="clearText()" class="danger">Clear</button>
+        <!-- Navigation Menu -->
+        <div class="nav-menu">
+            <button class="nav-btn active" onclick="showTool('encrypt')" data-tool="encrypt">
+                <span>🔐 Encrypt Tool</span>
+            </button>
+            <button class="nav-btn" onclick="showTool('decrypt')" data-tool="decrypt">
+                <span>🔓 Decrypt Tool</span>
+            </button>
+            <button class="nav-btn" onclick="showTool('password')" data-tool="password">
+                <span>🔑 Password Generator</span>
+            </button>
+            <button class="nav-btn" onclick="showTool('encryptFile')" data-tool="encryptFile">
+                <span>📁 Encrypt File</span>
+            </button>
+            <button class="nav-btn" onclick="showTool('decryptFile')" data-tool="decryptFile">
+                <span>📂 Decrypt File</span>
+            </button>
         </div>
 
-        <label>Output</label>
-        <textarea id="outputText" readonly></textarea>
+        <!-- Encrypt Tool -->
+        <div class="tool-container active" id="encrypt-tool">
+            <h2 class="tool-title">Encrypt Online</h2>
+            <p class="tool-description">Encrypt text, strings, JSON, YAML, config files and more!</p>
 
-        <button onclick="copyOutput()" class="copy">Copy Output</button>
+            <div class="form-section">
+                <label>Encryption type</label>
+                <select id="encrypt-algo" onchange="updateEncryptAlgo()">
+                    <option value="aes-256-cbc">aes-256-cbc</option>
+                    <option value="des3">des3</option>
+                    <option value="base64">base64</option>
+                    <option value="caesar">caesar</option>
+                    <option value="rot13">rot13</option>
+                </select>
+            </div>
 
-        <div class="links">
-            <a href="about.html">About</a> |
-            <a href="algorithms.html">Algorithms</a>
+            <div class="two-column">
+                <div class="form-section">
+                    <label>Enter text to encrypt here</label>
+                    <textarea id="encrypt-input" placeholder="Enter text to encrypt here"></textarea>
+                </div>
+                <div class="form-section">
+                    <label>Encrypted value will appear here</label>
+                    <textarea id="encrypt-output" placeholder="Encrypted value will appear here" readonly></textarea>
+                </div>
+            </div>
+
+            <div class="form-section" id="encrypt-passphrase-section">
+                <label>Passphrase</label>
+                <input type="password" id="encrypt-passphrase" placeholder="Passphrase">
+                <div class="passphrase-toggle">
+                    <input type="checkbox" id="encrypt-show-pass" onchange="togglePassphrase('encrypt')">
+                    <label for="encrypt-show-pass" style="margin: 0; font-weight: 400;">Show passphrase</label>
+                </div>
+                <button class="btn btn-outline" style="margin-top: 1rem; width: auto;" onclick="generatePassphrase('encrypt')">Generate passphrase</button>
+            </div>
+
+            <div class="button-group">
+                <button class="btn btn-primary" onclick="performEncryption()">🔒 Encrypt</button>
+                <button class="btn btn-outline" onclick="clearEncrypt()">🗑️ Clear</button>
+            </div>
+
+            <p style="text-align: center; color: var(--text-secondary); font-size: 0.8rem; margin-top: 1rem;">
+                Enter input text and a passphrase to enable encryption.
+            </p>
+        </div>
+
+        <!-- Decrypt Tool -->
+        <div class="tool-container" id="decrypt-tool">
+            <h2 class="tool-title">Decrypt Online</h2>
+            <p class="tool-description">Online Decryption Tool</p>
+
+            <div class="form-section">
+                <label>Decryption type</label>
+                <select id="decrypt-algo" onchange="updateDecryptAlgo()">
+                    <option value="aes-256-cbc">aes-256-cbc</option>
+                    <option value="des3">des3</option>
+                    <option value="base64">base64</option>
+                    <option value="caesar">caesar</option>
+                    <option value="rot13">rot13</option>
+                </select>
+            </div>
+
+            <div class="two-column">
+                <div class="form-section">
+                    <label>Enter text to decrypt here</label>
+                    <textarea id="decrypt-input" placeholder="Enter text to decrypt here"></textarea>
+                </div>
+                <div class="form-section">
+                    <label>Decrypted value will appear here</label>
+                    <textarea id="decrypt-output" placeholder="Decrypted value will appear here" readonly></textarea>
+                </div>
+            </div>
+
+            <div class="form-section" id="decrypt-passphrase-section">
+                <label>Passphrase</label>
+                <input type="password" id="decrypt-passphrase" placeholder="Passphrase">
+                <div class="passphrase-toggle">
+                    <input type="checkbox" id="decrypt-show-pass" onchange="togglePassphrase('decrypt')">
+                    <label for="decrypt-show-pass" style="margin: 0; font-weight: 400;">Show passphrase</label>
+                </div>
+            </div>
+
+            <div class="button-group">
+                <button class="btn btn-secondary" onclick="performDecryption()">🔓 Decrypt</button>
+                <button class="btn btn-outline" onclick="clearDecrypt()">🗑️ Clear</button>
+            </div>
+
+            <p style="text-align: center; color: var(--text-secondary); font-size: 0.8rem; margin-top: 1rem;">
+                Enter the encrypted value and passphrase to enable decryption.
+            </p>
+        </div>
+
+        <!-- Password Generator -->
+        <div class="tool-container" id="password-tool">
+            <h2 class="tool-title">Password Generator</h2>
+            <p class="tool-description">Generate strong passwords locally in your browser</p>
+
+            <div class="form-section">
+                <label>Length</label>
+                <div class="password-options">
+                    <input type="range" id="password-length" min="8" max="64" value="24" oninput="updateLengthDisplay()">
+                    <span class="length-display" id="length-display">24</span>
+                </div>
+            </div>
+
+            <div class="password-options" style="margin-bottom: 1.5rem;">
+                <div class="checkbox-group">
+                    <input type="checkbox" id="include-numbers" checked>
+                    <label for="include-numbers" style="margin: 0; font-weight: 400;">Include Numbers</label>
+                </div>
+                <div class="checkbox-group">
+                    <input type="checkbox" id="include-symbols" checked>
+                    <label for="include-symbols" style="margin: 0; font-weight: 400;">Include Symbols</label>
+                </div>
+            </div>
+
+            <div class="output-box" id="password-output" style="font-size: 1.2rem; text-align: center; min-height: 80px; display: flex; align-items: center; justify-content: center;">
+                Click Generate to create a password
+                <button class="copy-btn" onclick="copyPassword()" id="password-copy-btn" style="display: none;">
+                    📋 Copy
+                </button>
+            </div>
+
+            <div class="button-group">
+                <button class="btn btn-primary" onclick="generatePassword()">⚡ Generate Password</button>
+            </div>
+        </div>
+
+        <!-- Encrypt File -->
+        <div class="tool-container" id="encryptFile-tool">
+            <h2 class="tool-title">Encrypt File</h2>
+            <p class="tool-description">Protect files with client-side encryption</p>
+
+            <div class="alert alert-warning">
+                <strong>Safety note:</strong> Files are encrypted locally in your browser. Keep the password safe because it is required to decrypt the file.
+            </div>
+
+            <div class="form-section">
+                <label>Upload + encrypt</label>
+                <div class="file-upload-zone" id="encrypt-file-zone" onclick="document.getElementById('encrypt-file-input').click()">
+                    <div class="file-icon">📄</div>
+                    <div><strong>Drag and drop any file or click to select</strong></div>
+                    <div class="file-name" id="encrypt-file-name"></div>
+                </div>
+                <input type="file" id="encrypt-file-input" style="display: none;" onchange="handleEncryptFile(this)">
+            </div>
+
+            <div class="form-section">
+                <label>Password</label>
+                <input type="password" id="encrypt-file-password" placeholder="Enter a password">
+                <p style="font-size: 0.75rem; color: var(--text-secondary); margin-top: 0.5rem;">
+                    Keep this password safe. It is required to decrypt the file.
+                </p>
+            </div>
+
+            <div class="button-group">
+                <button class="btn btn-primary" onclick="encryptFile()" id="encrypt-file-btn" disabled>🔒 Encrypt File</button>
+            </div>
+
+            <p style="text-align: center; color: var(--text-secondary); font-size: 0.8rem; margin-top: 1rem;">
+                Encrypt any file type. The output uses the .encr extension for the Decrypt File tool.
+            </p>
+            <p style="text-align: center; color: var(--text-secondary); font-size: 0.8rem;">
+                Large files may take longer to process. Keep this tab open until the download starts.
+            </p>
+        </div>
+
+        <!-- Decrypt File -->
+        <div class="tool-container" id="decryptFile-tool">
+            <h2 class="tool-title">Decrypt File</h2>
+            <p class="tool-description">Open .encr files created by this site</p>
+
+            <div class="alert alert-warning">
+                <strong>Safety note:</strong> Decryption runs locally in your browser. Use the same password that was used to encrypt the file.
+            </div>
+
+            <div class="form-section">
+                <label>Upload + decrypt</label>
+                <div class="file-upload-zone" id="decrypt-file-zone" onclick="document.getElementById('decrypt-file-input').click()">
+                    <div class="file-icon">🔐</div>
+                    <div><strong>Drag and drop an encrypted file or click to select</strong></div>
+                    <div class="file-name" id="decrypt-file-name"></div>
+                </div>
+                <input type="file" id="decrypt-file-input" accept=".encr" style="display: none;" onchange="handleDecryptFile(this)">
+            </div>
+
+            <div class="form-section">
+                <label>Password</label>
+                <input type="password" id="decrypt-file-password" placeholder="Enter the password">
+                <p style="font-size: 0.75rem; color: var(--text-secondary); margin-top: 0.5rem;">
+                    Use the same password that was used to encrypt the file.
+                </p>
+            </div>
+
+            <div class="button-group">
+                <button class="btn btn-secondary" onclick="decryptFile()" id="decrypt-file-btn" disabled>🔓 Decrypt File</button>
+            </div>
+
+            <p style="text-align: center; color: var(--text-secondary); font-size: 0.8rem; margin-top: 1rem;">
+                Supports .encr files created by this site (legacy .encrypted is also accepted).
+            </p>
         </div>
     </div>
 
-    <script src="js/aes.js"></script>
-    <script src="js/base64.js"></script>
-    <script src="js/hash.js"></script>
-    <script src="js/main.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
+    <script>
+        // Navigation
+        function showTool(toolName) {
+            // Update nav buttons
+            document.querySelectorAll('.nav-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            document.querySelector(`[data-tool="${toolName}"]`).classList.add('active');
 
+            // Show selected tool
+            document.querySelectorAll('.tool-container').forEach(container => {
+                container.classList.remove('active');
+            });
+            document.getElementById(`${toolName}-tool`).classList.add('active');
+        }
+
+        // Encrypt Tool Functions
+        function updateEncryptAlgo() {
+            const algo = document.getElementById('encrypt-algo').value;
+            const passphraseSection = document.getElementById('encrypt-passphrase-section');
+            
+            if (algo === 'base64' || algo === 'rot13') {
+                passphraseSection.style.display = 'none';
+            } else {
+                passphraseSection.style.display = 'block';
+            }
+        }
+
+        function performEncryption() {
+            const input = document.getElementById('encrypt-input').value;
+            const algo = document.getElementById('encrypt-algo').value;
+            const passphrase = document.getElementById('encrypt-passphrase').value;
+            const output = document.getElementById('encrypt-output');
+
+            if (!input) {
+                alert('Please enter text to encrypt');
+                return;
+            }
+
+            if ((algo === 'aes-256-cbc' || algo === 'des3' || algo === 'caesar') && !passphrase) {
+                alert('Please enter a passphrase');
+                return;
+            }
+
+            try {
+                let result = '';
+                
+                switch(algo) {
+                    case 'aes-256-cbc':
+                        result = CryptoJS.AES.encrypt(input, passphrase).toString();
+                        break;
+                    case 'des3':
+                        result = CryptoJS.TripleDES.encrypt(input, passphrase).toString();
+                        break;
+                    case 'base64':
+                        result = btoa(unescape(encodeURIComponent(input)));
+                        break;
+                    case 'caesar':
+                        const shift = parseInt(passphrase) || 3;
+                        result = caesarCipher(input, shift);
+                        break;
+                    case 'rot13':
+                        result = rot13(input);
+                        break;
+                }
+
+                output.value = result;
+            } catch(error) {
+                alert('Encryption failed: ' + error.message);
+            }
+        }
+
+        function clearEncrypt() {
+            document.getElementById('encrypt-input').value = '';
+            document.getElementById('encrypt-output').value = '';
+            document.getElementById('encrypt-passphrase').value = '';
+        }
+
+        // Decrypt Tool Functions
+        function updateDecryptAlgo() {
+            const algo = document.getElementById('decrypt-algo').value;
+            const passphraseSection = document.getElementById('decrypt-passphrase-section');
+            
+            if (algo === 'base64' || algo === 'rot13') {
+                passphraseSection.style.display = 'none';
+            } else {
+                passphraseSection.style.display = 'block';
+            }
+        }
+
+        function performDecryption() {
+            const input = document.getElementById('decrypt-input').value;
+            const algo = document.getElementById('decrypt-algo').value;
+            const passphrase = document.getElementById('decrypt-passphrase').value;
+            const output = document.getElementById('decrypt-output');
+
+            if (!input) {
+                alert('Please enter text to decrypt');
+                return;
+            }
+
+            if ((algo === 'aes-256-cbc' || algo === 'des3' || algo === 'caesar') && !passphrase) {
+                alert('Please enter a passphrase');
+                return;
+            }
+
+            try {
+                let result = '';
+                
+                switch(algo) {
+                    case 'aes-256-cbc':
+                        const bytes = CryptoJS.AES.decrypt(input, passphrase);
+                        result = bytes.toString(CryptoJS.enc.Utf8);
+                        if (!result) throw new Error('Invalid passphrase or corrupted data');
+                        break;
+                    case 'des3':
+                        const bytes3 = CryptoJS.TripleDES.decrypt(input, passphrase);
+                        result = bytes3.toString(CryptoJS.enc.Utf8);
+                        if (!result) throw new Error('Invalid passphrase or corrupted data');
+                        break;
+                    case 'base64':
+                        result = decodeURIComponent(escape(atob(input)));
+                        break;
+                    case 'caesar':
+                        const shift = parseInt(passphrase) || 3;
+                        result = caesarCipher(input, -shift);
+                        break;
+                    case 'rot13':
+                        result = rot13(input);
+                        break;
+                }
+
+                output.value = result;
+            } catch(error) {
+                alert('Decryption failed: ' + error.message);
+            }
+        }
+
+        function clearDecrypt() {
+            document.getElementById('decrypt-input').value = '';
+            document.getElementById('decrypt-output').value = '';
+            document.getElementById('decrypt-passphrase').value = '';
+        }
+
+        // Helper functions
+        function caesarCipher(text, shift) {
+            return text.replace(/[a-zA-Z]/g, char => {
+                const code = char.charCodeAt(0);
+                const isUpperCase = code >= 65 && code <= 90;
+                const base = isUpperCase ? 65 : 97;
+                return String.fromCharCode(((code - base + shift + 26) % 26) + base);
+            });
+        }
+
+        function rot13(text) {
+            return text.replace(/[a-zA-Z]/g, char => {
+                const code = char.charCodeAt(0);
+                const isUpperCase = code >= 65 && code <= 90;
+                const base = isUpperCase ? 65 : 97;
+                return String.fromCharCode(((code - base + 13) % 26) + base);
+            });
+        }
+
+        function togglePassphrase(type) {
+            const input = document.getElementById(`${type}-passphrase`);
+            const checkbox = document.getElementById(`${type}-show-pass`);
+            input.type = checkbox.checked ? 'text' : 'password';
+        }
+
+        function generatePassphrase(type) {
+            const length = 16;
+            const charset = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&*';
+            let passphrase = '';
+            for (let i = 0; i < length; i++) {
+                passphrase += charset.charAt(Math.floor(Math.random() * charset.length));
+            }
+            document.getElementById(`${type}-passphrase`).value = passphrase;
+        }
+
+        // Password Generator Functions
+        function updateLengthDisplay() {
+            const length = document.getElementById('password-length').value;
+            document.getElementById('length-display').textContent = length;
+        }
+
+        function generatePassword() {
+            const length = parseInt(document.getElementById('password-length').value);
+            const includeNumbers = document.getElementById('include-numbers').checked;
+            const includeSymbols = document.getElementById('include-symbols').checked;
+
+            let charset = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
+            if (includeNumbers) charset += '0123456789';
+            if (includeSymbols) charset += '!@#$%^&*()_+-=[]{}|;:,.<>?';
+
+            let password = '';
+            for (let i = 0; i < length; i++) {
+                password += charset.charAt(Math.floor(Math.random() * charset.length));
+            }
+
+            const output = document.getElementById('password-output');
+            output.textContent = password;
+            document.getElementById('password-copy-btn').style.display = 'block';
+        }
+
+        function copyPassword() {
+            const output = document.getElementById('password-output');
+            const text = output.textContent;
+            
+            navigator.clipboard.writeText(text).then(() => {
+                const btn = document.getElementById('password-copy-btn');
+                btn.textContent = '✅ Copied!';
+                btn.style.borderColor = 'var(--neon-green)';
+                btn.style.color = 'var(--neon-green)';
+                
+                setTimeout(() => {
+                    btn.textContent = '📋 Copy';
+                    btn.style.borderColor = 'var(--neon-cyan)';
+                    btn.style.color = 'var(--neon-cyan)';
+                }, 2000);
+            });
+        }
+
+        // File Encryption Functions
+        let encryptFileData = null;
+        let decryptFileData = null;
+
+        function handleEncryptFile(input) {
+            const file = input.files[0];
+            if (file) {
+                document.getElementById('encrypt-file-name').textContent = `📄 ${file.name}`;
+                encryptFileData = file;
+                document.getElementById('encrypt-file-btn').disabled = false;
+            }
+        }
+
+        function encryptFile() {
+            const password = document.getElementById('encrypt-file-password').value;
+            
+            if (!encryptFileData) {
+                alert('Please select a file');
+                return;
+            }
+            
+            if (!password) {
+                alert('Please enter a password');
+                return;
+            }
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const fileContent = e.target.result;
+                const wordArray = CryptoJS.lib.WordArray.create(new Uint8Array(fileContent));
+                const encrypted = CryptoJS.AES.encrypt(wordArray, password).toString();
+                
+                const blob = new Blob([encrypted], { type: 'text/plain' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = encryptFileData.name + '.encr';
+                a.click();
+                URL.revokeObjectURL(url);
+                
+                alert('File encrypted successfully!');
+            };
+            reader.readAsArrayBuffer(encryptFileData);
+        }
+
+        function handleDecryptFile(input) {
+            const file = input.files[0];
+            if (file) {
+                document.getElementById('decrypt-file-name').textContent = `🔐 ${file.name}`;
+                decryptFileData = file;
+                document.getElementById('decrypt-file-btn').disabled = false;
+            }
+        }
+
+        function decryptFile() {
+            const password = document.getElementById('decrypt-file-password').value;
+            
+            if (!decryptFileData) {
+                alert('Please select a file');
+                return;
+            }
+            
+            if (!password) {
+                alert('Please enter a password');
+                return;
+            }
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    const encryptedContent = e.target.result;
+                    const decrypted = CryptoJS.AES.decrypt(encryptedContent, password);
+                    const wordArray = decrypted.words;
+                    const arrayBuffer = new ArrayBuffer(decrypted.sigBytes);
+                    const uint8Array = new Uint8Array(arrayBuffer);
+                    
+                    for (let i = 0; i < decrypted.sigBytes; i++) {
+                        uint8Array[i] = (wordArray[i >>> 2] >>> (24 - (i % 4) * 8)) & 0xff;
+                    }
+                    
+                    const blob = new Blob([uint8Array]);
+                    const url = URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.href = url;
+                    const originalName = decryptFileData.name.replace('.encr', '').replace('.encrypted', '');
+                    a.download = originalName;
+                    a.click();
+                    URL.revokeObjectURL(url);
+                    
+                    alert('File decrypted successfully!');
+                } catch(error) {
+                    alert('Decryption failed. Please check your password.');
+                }
+            };
+            reader.readAsText(decryptFileData);
+        }
+
+        // Drag and drop
+        const encryptZone = document.getElementById('encrypt-file-zone');
+        const decryptZone = document.getElementById('decrypt-file-zone');
+
+        ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+            encryptZone.addEventListener(eventName, preventDefaults, false);
+            decryptZone.addEventListener(eventName, preventDefaults, false);
+        });
+
+        function preventDefaults(e) {
+            e.preventDefault();
+            e.stopPropagation();
+        }
+
+        ['dragenter', 'dragover'].forEach(eventName => {
+            encryptZone.addEventListener(eventName, () => encryptZone.classList.add('dragover'), false);
+            decryptZone.addEventListener(eventName, () => decryptZone.classList.add('dragover'), false);
+        });
+
+        ['dragleave', 'drop'].forEach(eventName => {
+            encryptZone.addEventListener(eventName, () => encryptZone.classList.remove('dragover'), false);
+            decryptZone.addEventListener(eventName, () => decryptZone.classList.remove('dragover'), false);
+        });
+
+        encryptZone.addEventListener('drop', (e) => {
+            const dt = e.dataTransfer;
+            const files = dt.files;
+            document.getElementById('encrypt-file-input').files = files;
+            handleEncryptFile({ files: files });
+        }, false);
+
+        decryptZone.addEventListener('drop', (e) => {
+            const dt = e.dataTransfer;
+            const files = dt.files;
+            document.getElementById('decrypt-file-input').files = files;
+            handleDecryptFile({ files: files });
+        }, false);
+    </script>
 </body>
 </html>
